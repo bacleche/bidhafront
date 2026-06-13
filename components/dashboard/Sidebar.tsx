@@ -2,20 +2,61 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, Building2, Home, Users, User, ArrowLeftRight, FileText, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Building2, Home, Users, User, ArrowLeftRight, FileText, Settings, LogOut, ChevronRight, AlertTriangle, CalendarCheck, MessageCircle } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, exact: true },
-  { href: '/dashboard/properties', label: 'Biens', icon: Home },
-  { href: '/dashboard/agents', label: 'Agents', icon: Users },
-  { href: '/dashboard/clients', label: 'Clients', icon: User },
-  { href: '/dashboard/transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { href: '/dashboard/contracts', label: 'Contrats', icon: FileText },
-];
+type Role = 'admin' | 'agency_owner' | 'agent' | 'client';
+const NAV_ITEMS = {
+  admin: [
+    { href: '/dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, exact: true },
+    { href: '/dashboard/properties', label: 'Biens', icon: Home },
+    { href: '/dashboard/agents', label: 'Agents', icon: Users },
+    { href: '/dashboard/clients', label: 'Clients', icon: User },
+    { href: '/dashboard/transactions', label: 'Transactions', icon: ArrowLeftRight },
+    { href: '/dashboard/contracts', label: 'Contrats', icon: FileText },
+  ],
+  agency_owner: [
+    { href: '/dashboard', label: 'Mon Agence', icon: LayoutDashboard, exact: true },
+    { href: '/dashboard/properties/agent/nouvel', label: 'Nouvel Agent', icon: LayoutDashboard, exact: true },
+    { href: '/dashboard/properties', label: 'Mes Biens', icon: Home  , exact: true},
+    { href: '/dashboard/transactions', label: 'Suivi Financier', icon: ArrowLeftRight },
+    { href: '/dashboard/gestion_owner/contracts', label: 'Initialiser Contrat', icon: FileText , exact: true  },
+    { href: '/dashboard/gestion_owner/contracts/list', label: 'Liste des Contrats', icon: FileText },
+
+    { href: '/dashboard/gestion_owner/transactions', label: 'Gestion transactions', icon: ArrowLeftRight },
+    { href: '/dashboard/gestion_owner/plaintes', label: 'Gestion plaintes', icon: AlertTriangle },
+    { href: '/dashboard/gestion_owner/liste_visite', label: 'Gestion visite', icon: CalendarCheck },
+
+
+
+  ],
+  agent: [
+    { href: '/dashboard', label: 'Mon Tableau de Bord', icon: LayoutDashboard, exact: true },
+    { href: '/dashboard/properties', label: 'Biens à gérer', icon: Home },
+    { href: '/dashboard/contracts', label: 'Contrats en cours', icon: FileText },
+    { href: '/dashboard/gestion/transactions', label: 'Gestion transactions', icon: ArrowLeftRight },
+    { href: '/dashboard/gestion/messages', label: 'Messages clients', icon: MessageCircle },
+    { href: '/dashboard/gestion/visiteplanning', label: 'Gestion planning', icon: CalendarCheck },
+
+
+  ],
+  client: [
+    { href: '/dashboard/clients', label: 'Mon Espace', icon: LayoutDashboard, exact: true },
+    { href: '/dashboard/clients/transactions', label: 'Gestion transactions', icon: ArrowLeftRight },
+    { href: '/dashboard/clients/zone/contrats', label: 'Mes contrats', icon: LayoutDashboard, exact: true },
+    { href: '/dashboard/clients/zone/plaintes', label: 'Mes plaintes', icon: AlertTriangle, exact: true },
+
+
+  ]
+};
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+
+  // Filtrage des items selon le rôle de l'utilisateur
+  // Si aucun rôle n'est trouvé, on n'affiche rien ou seulement le tableau de bord
+const userRole = (user?.role as Role) || 'client'; 
+  const allowedItems = NAV_ITEMS[userRole] || [];
 
   return (
     <aside className="w-64 bg-gradient-to-b from-blue-950 to-blue-900 min-h-screen flex flex-col text-white shrink-0">
@@ -32,15 +73,15 @@ export default function Sidebar() {
             {user?.first_name?.[0]}{user?.last_name?.[0]}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold truncate">{user?.first_name} {user?.last_name}</p>
-            <p className="text-xs text-blue-300 capitalize">{user?.role?.replace('_', ' ')}</p>
+            <p className="text-sm font-semibold truncate">{user?.first_name || 'Utilisateur'} {user?.last_name}</p>
+            <p className="text-xs text-blue-300 capitalize">{user?.role?.replace('_', ' ') || 'Client'}</p>
           </div>
         </div>
       </div>
 
-      {/* Nav */}
+      {/* Nav dynamique */}
       <nav className="flex-1 p-3 space-y-0.5">
-        {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+        {allowedItems.map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (
             <Link key={href} href={href} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all group ${active ? 'bg-white/15 text-white' : 'text-blue-200 hover:bg-white/10 hover:text-white'}`}>

@@ -22,7 +22,7 @@ export default function PropertyCard({ property }: { property: Property }) {
       {/* Image */}
       <div className="relative h-52 bg-gradient-to-br from-blue-100 to-blue-200 overflow-hidden">
         {coverImg ? (
-          <img src={`http://localhost:8000${coverImg.image}`} alt={property.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img src={`${coverImg.image}`} alt={property.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <div className="w-16 h-16 rounded-2xl bg-blue-200 flex items-center justify-center">

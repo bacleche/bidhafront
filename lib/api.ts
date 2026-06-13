@@ -37,10 +37,24 @@ api.interceptors.response.use(
 );
 
 export const endpoints = {
-  auth: { login:'/auth/login/', register:'/auth/register/', profile:'/auth/profile/' },
-  agencies: '/agencies/', agents: '/agents/',
-  properties: '/properties/', propertiesFeatured: '/properties/featured/', propertiesStats: '/properties/stats/',
+  auth: { 
+    login: '/auth/login/', 
+    register: '/auth/register/', 
+    profile: '/auth/profile/',
+  },
+  clientStats: 'client-stats/',
+  agencies: '/agencies/', 
+  agenciesMine: '/agencies/mine/', 
+  agents: '/agents/',
+  properties: '/properties/', 
+  propertiesFeatured: '/properties/featured/', 
+  propertiesStats: '/properties/stats/',
   clients: '/clients/',
-  transactions: '/transactions/', transactionsStats: '/transactions/stats/',
+  transactions: '/transactions/', 
+  transactionsStats: '/transactions/stats/',
   contracts: '/contracts/',
+
+   contactRequests: '/contact-requests/',
+  visitRequests: '/visit-requests/',
+  complaints: '/complaints/',
 };

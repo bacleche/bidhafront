@@ -4,6 +4,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Building2, Eye, EyeOff, Loader2 } from 'lucide-react';
+// types/auth.ts (ou dans votre AuthContext.tsx)
+export interface User {
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  role: 'admin' | 'agency_owner' | 'agent' | 'client';
+  email: string;
+}
+
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -12,17 +22,35 @@ export default function LoginPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true); 
+  setError('');
+  
+  try {
+    const userData = await login(form.username, form.password);
+    
+    const roleRoutes: Record<string, string> = {
+      'admin':        '/dashboard',
+      'agency_owner': '/dashboard',
+      'agent':        '/dashboard',
+      'client':       '/dashboard/clients',
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true); setError('');
-    try {
-      await login(form.username, form.password);
-      router.push('/dashboard');
-    } catch {
-      setError('Identifiants incorrects. Vérifiez votre nom d\'utilisateur et mot de passe.');
-    } finally { setLoading(false); }
-  };
+    // DEBUG : Affichez le rôle reçu pour voir pourquoi ça ne matche pas
+    console.log("Rôle reçu de l'API :", userData.role);
+
+    // Sécurisation : on utilise une route par défaut si le rôle n'existe pas
+    const targetRoute = roleRoutes[userData.role] || '/dashboard';
+    
+    router.push(targetRoute);
+    
+  } catch (err) {
+    setError('Identifiants incorrects ou rôle non reconnu.');
+  } finally { 
+    setLoading(false); 
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 flex items-center justify-center p-4">

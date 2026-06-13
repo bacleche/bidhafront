@@ -1,15 +1,17 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api, endpoints } from '@/lib/api';
-import { User } from '@/types';
+import type { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  // Modifiez Promise<void> par Promise<User>
+  login: (username: string, password: string) => Promise<User>; 
   logout: () => void;
   isAuthenticated: boolean;
 }
+
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
@@ -23,20 +25,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     else setLoading(false);
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      const { data } = await api.get(endpoints.auth.profile);
-      setUser(data);
-    } catch { localStorage.clear(); }
-    finally { setLoading(false); }
-  };
+  const fetchProfile = async (): Promise<User> => {
+  try {
+    const { data } = await api.get(endpoints.auth.profile);
+    setUser(data);
+    return data;           // ← ajout clé
+  } catch {
+    localStorage.clear();
+    throw new Error('Profile fetch failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const login = async (username: string, password: string) => {
-    const { data } = await api.post(endpoints.auth.login, { username, password });
-    localStorage.setItem('access_token', data.access);
-    localStorage.setItem('refresh_token', data.refresh);
-    await fetchProfile();
-  };
+const login = async (username: string, password: string): Promise<User> => {
+  const { data } = await api.post(endpoints.auth.login, { username, password });
+  localStorage.setItem('access_token', data.access);
+  localStorage.setItem('refresh_token', data.refresh);
+  return await fetchProfile();   // ← return ajouté
+};
 
   const logout = () => {
     localStorage.clear();
