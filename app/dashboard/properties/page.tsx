@@ -5,6 +5,7 @@ import { Property } from '@/types';
 import { Plus, Home, MapPin, Trash2, Search, SlidersHorizontal, Eye, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://bidhaback-production.up.railway.app/api';
 
 const TYPE_LABELS: Record<string, string> = {
   apartment: 'Appartement',
@@ -138,7 +139,7 @@ export default function DashboardPropertiesPage() {
                 <div className="h-48 w-full bg-gray-100 relative overflow-hidden shrink-0">
                   {coverImage ? (
                     <img 
-                      src={`${coverImage}`} 
+                      src={`${API_BASE}${coverImage}`} 
                       alt={p.title} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
