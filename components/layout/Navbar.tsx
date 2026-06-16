@@ -118,7 +118,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile menu */}
-        {open && (
+        {/* {open && (
           <div className="md:hidden border-t border-gray-100 py-4 space-y-1 animate-fade-up">
             {[['/', 'Accueil'], ['/properties', 'Biens'], ['/agencies', 'Agences'], ['/contact', 'Contact']].map(([href, label]) => (
               <Link key={href} href={href} onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all">{label}</Link>
@@ -141,7 +141,29 @@ export default function Navbar() {
               )}
             </div>
           </div>
-        )}
+        )} */}
+
+        {/* Mobile menu */}
+{open && (
+  <div className="md:hidden border-t border-gray-100 py-4 space-y-1 animate-fade-up">
+    {[['/', 'Accueil'], ['/properties', 'Biens'], ['/agencies', 'Agences'], ['/contact', 'Contact']].map(([href, label]) => (
+      <Link key={href} href={href} onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all">{label}</Link>
+    ))}
+    <div className="pt-2 border-t border-gray-100 flex gap-2">
+      {isAuthenticated ? (
+        <>
+          <Link href="/dashboard" onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl">Dashboard</Link>
+          <button onClick={() => { logout(); setOpen(false); }} className="flex-1 py-2.5 text-sm font-bold text-red-500 bg-red-50 rounded-xl">Déconnexion</button>
+        </>
+      ) : (
+        <>
+          <Link href="/login" onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-blue-600 border border-blue-200 rounded-xl">Connexion</Link>
+          <Link href="/register" onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl">Inscription</Link>
+        </>
+      )}
+    </div>
+  </div>
+)}
       </div>
     </nav>
   );
