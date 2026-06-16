@@ -36,10 +36,9 @@ export default function AgentsPage() {
 
   useEffect(() => { fetchAgents(); }, []);
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
     setLoading(true); setError('');
     
-    // Structuration conforme au Serializer Django
     const payload: any = {
       user: {
         first_name: form.first_name,
@@ -49,15 +48,17 @@ export default function AgentsPage() {
       },
       specialization: form.specialization,
       commission_rate: form.commission_rate,
+      // AJOUT CRUCIAL : vérifiez si votre modèle a besoin d'une agency_id
+      // agency: user?.agency_id 
     };
 
-    // Ajout du mot de passe uniquement si présent
     if (form.password) {
       payload.user.password = form.password;
     }
 
     try {
       if (editingAgent) {
+        // Pour un PATCH, n'envoyez que ce qui a changé si possible
         await api.patch(`${endpoints.agents}${editingAgent.id}/`, payload);
       } else {
         await api.post(endpoints.agents, payload);
@@ -67,7 +68,8 @@ export default function AgentsPage() {
       setForm(EMPTY_FORM);
       fetchAgents();
     } catch (e: any) {
-      setError("Erreur : vérifiez vos informations (email déjà utilisé ?)");
+      console.error(e);
+      setError("Détail de l'erreur: " + JSON.stringify(e.response?.data || e.message));
     } finally {
       setLoading(false);
     }
