@@ -11,7 +11,9 @@ export const api = axios.create({
 
 export const getImg = (path: string) => {
   if (!path) return '';
-  if (path.startsWith('http')) return path;
+  if (path.startsWith('http')) {
+    return path.replace('http://', 'https://');  // ← force https
+  }
   const base = API_BASE.replace('/api', '');
   return `${base}${path}`;
 };
