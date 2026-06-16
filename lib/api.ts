@@ -41,7 +41,7 @@ api.interceptors.response.use(
 export const endpoints = {
   auth: { 
     login: '/auth/login/', 
-    register: '/auth/register/', 
+    register: 'auth/register/', 
     profile: '/auth/profile/',
   },
   clientStats: 'client-stats/',
