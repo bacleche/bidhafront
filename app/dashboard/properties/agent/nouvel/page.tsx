@@ -125,7 +125,7 @@ export default function AgentsPage() {
               <button onClick={() => setShowForm(false)} className="text-gray-400"><X size={20} /></button>
             </div>
             <div className="p-5 grid grid-cols-2 gap-3">
-              {[ { key: 'first_name', label: 'Prénom' }, { key: 'last_name', label: 'Nom' }, { key: 'email', label: 'Email' }, { key: 'phone', label: 'Téléphone' }, { key: 'specialization', label: 'Spécialisation' }, { key: 'commission_rate', label: 'Commission (%)', type: 'number' } ].map(({ key, label, type = 'text' }) => (
+              {[ { key: 'first_name', label: 'Prénom' }, { key: 'last_name', label: 'Nom' }, { key: 'email', label: 'Email' }, { key: 'phone', label: 'Téléphone' },{ key: 'password', label: 'Mot de passe', type: 'password' }, { key: 'specialization', label: 'Spécialisation' }, { key: 'commission_rate', label: 'Commission (%)', type: 'number' } ].map(({ key, label, type = 'text' }) => (
                 <div key={key} className={key === 'specialization' ? 'col-span-2' : ''}>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
                   <input type={type} value={(form as any)[key]} onChange={(e) => setForm(f => ({ ...f, [key]: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" />
