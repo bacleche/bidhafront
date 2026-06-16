@@ -90,7 +90,7 @@ export default function Navbar() {
                           </span>
                         )}
                       </Link>
-                      <Link href="/dashboard/profile" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                      <Link href="/dashboard/settings" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
                         <User size={15} /> Mon profil
                       </Link>
                       <Link href="/dashboard/settings" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
