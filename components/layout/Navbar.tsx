@@ -26,6 +26,15 @@ export default function Navbar() {
     const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
+  const getDashboardHref = () => {
+  switch (user?.role?.toLowerCase()) {
+    case 'agency_owner': return '/dashboard';
+    case 'agent':        return '/dashboard';
+    case 'client':       return '/dashboard/clients';
+    case 'admin':        return '/dashboard';
+    default:             return '/dashboard';
+  }
+};
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-blue-100 shadow-sm">
@@ -79,7 +88,7 @@ export default function Navbar() {
                         <p className="text-xs text-gray-500 font-medium">Connecté en tant que</p>
                         <p className="text-sm font-bold text-gray-800">{user?.email}</p>
                       </div>
-                      <Link href="/dashboard" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                      <Link href={getDashboardHref()} onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
                         <LayoutDashboard size={15} /> Tableau de bord
                       </Link>
                       <Link href="/dashboard/notifications" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
@@ -152,7 +161,10 @@ export default function Navbar() {
     <div className="pt-2 border-t border-gray-100 flex gap-2">
       {isAuthenticated ? (
         <>
-          <Link href="/dashboard" onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl">Dashboard</Link>
+          {/* <Link href="/dashboard" onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl">Dashboard</Link> */}
+          <Link href={getDashboardHref()} onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl">
+            Dashboard
+          </Link>
           <button onClick={() => { logout(); setOpen(false); }} className="flex-1 py-2.5 text-sm font-bold text-red-500 bg-red-50 rounded-xl">Déconnexion</button>
         </>
       ) : (
