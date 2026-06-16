@@ -6,6 +6,7 @@ import { api, endpoints } from '@/lib/api';
 import { Agency } from '@/types';
 import { Building2, MapPin, Phone, Mail, Users, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://bidhaback-production.up.railway.app/api';
 
 export default function AgenciesPage() {
   const [agencies, setAgencies] = useState<Agency[]>([]);
@@ -34,7 +35,7 @@ export default function AgenciesPage() {
               <div key={agency.id} className="bidhaa-card p-6 group">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    {agency.logo ? <img src={`http://localhost:8000${agency.logo}`} alt={agency.name} className="w-full h-full object-cover rounded-2xl"/> : <Building2 size={26} className="text-blue-500"/>}
+                    {agency.logo ? <img src={`${API_BASE}${agency.logo}`} alt={agency.name} className="w-full h-full object-cover rounded-2xl"/> : <Building2 size={26} className="text-blue-500"/>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-display font-bold text-gray-900 text-sm leading-tight mb-1">{agency.name}</h3>
