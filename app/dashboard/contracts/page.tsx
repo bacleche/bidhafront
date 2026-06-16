@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { api, endpoints } from '@/lib/api';
 import { Contract } from '@/types';
 import { FileText, Plus, CheckCircle, Clock, XCircle, FileX, PenTool, X, Loader2 } from 'lucide-react';
+import Navbar from '@/components/layout/Navbar';
 
 const TYPE_LABELS: Record<string,string> = { sale_contract:'Contrat de Vente', lease_contract:'Contrat de Bail', purchase_contract:'Contrat d\'Achat', preliminary:'Avant-Contrat', mandate:'Mandat' };
 const STATUS_CONFIG: Record<string,{label:string;color:string;icon:any}> = {
@@ -84,18 +85,20 @@ export default function DashboardContractsPage() {
   const filtered = filter ? contracts.filter(c => c.status === filter || c.contract_type === filter) : contracts;
 
   return (
-    <div className="p-6">
+     <div className="min-h-screen bg-gray-50">
+          <Navbar />
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display font-bold text-2xl text-gray-900">Contrats</h1>
           <p className="text-gray-500 text-sm">{contracts.length} contrat{contracts.length !== 1 ? 's' : ''}</p>
         </div>
-        <button
+        {/* <button
           onClick={openModal}
           className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-blue-200 transition-all"
         >
           <Plus size={16} /> Nouveau contrat
-        </button>
+        </button> */}
       </div>
 
       {/* Summary cards */}
@@ -292,5 +295,7 @@ export default function DashboardContractsPage() {
         </div>
       )}
     </div>
+    </div>
+
   );
 }

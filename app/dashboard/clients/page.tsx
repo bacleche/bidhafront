@@ -5,8 +5,10 @@ import { useAuth } from '@/context/AuthContext';
 import {
   MessageCircle, CalendarCheck, AlertTriangle, Home,
   Clock, CheckCircle, XCircle, RefreshCw, Send, Loader2,
-  ArrowLeft, Calendar, ChevronRight
+  ArrowLeft, Calendar, ChevronRight, FileText
 } from 'lucide-react';
+import ClientContratsPage from './contrats/page';
+import Navbar from '@/components/layout/Navbar';
 
 const VISIT_STATUS: Record<string, { label: string; color: string; icon: any }> = {
   pending:     { label: 'En attente',    color: 'bg-amber-100 text-amber-700',    icon: Clock },
@@ -23,7 +25,7 @@ const COMPLAINT_STATUS: Record<string, { label: string; color: string }> = {
   closed:      { label: 'Clôturée',      color: 'bg-gray-100 text-gray-500' },
 };
 
-type Tab = 'contacts' | 'visits' | 'complaints';
+type Tab = 'contacts' | 'visits' | 'complaints' | 'contrats';
 
 export default function ClientDashboardPage() {
   const { user } = useAuth();
@@ -85,8 +87,9 @@ export default function ClientDashboardPage() {
       key: 'contacts', label: 'Messages', icon: MessageCircle, count: contacts.length,
       badge: contacts.filter(c => c.status === 'replied').length,
     },
-    { key: 'visits',     label: 'Visites',  icon: CalendarCheck, count: visits.length },
-    { key: 'complaints', label: 'Plaintes', icon: AlertTriangle,  count: complaints.length },
+    { key: 'visits',     label: 'Visites',   icon: CalendarCheck, count: visits.length },
+    { key: 'complaints', label: 'Plaintes',  icon: AlertTriangle,  count: complaints.length },
+    { key: 'contrats',   label: 'Contrats',  icon: FileText,       count: 0 },
   ];
 
   // ── VUE CONVERSATION OUVERTE ──
@@ -184,8 +187,11 @@ export default function ClientDashboardPage() {
 
   // ── VUE PRINCIPALE ──
   return (
-    <div className="p-5 max-w-2xl mx-auto space-y-5">
 
+     <div className="min-h-screen bg-gray-50">
+           <Navbar />   
+    <div className="p-5 max-w-2xl mx-auto space-y-5">
+     
       {/* Header */}
       <div>
         <h1 className="font-bold text-2xl text-gray-900">Mon espace</h1>
@@ -384,9 +390,14 @@ export default function ClientDashboardPage() {
               </div>
             )
           )}
+          {tab === 'contrats' && <ClientContratsPage />}
         </>
       )}
     </div>
+    </div>
+
+
+
   );
 }
 

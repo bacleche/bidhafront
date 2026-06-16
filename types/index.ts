@@ -8,10 +8,24 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  role: UserRole;          // ← string → UserRole
+  role: UserRole;
   phone: string;
   avatar?: string;
 }
+
+/** Représente un enregistrement Client du backend (modèle clients.Client) */
+export interface ClientRecord {
+  id: number;
+  username: string;   // champ virtuel calculé par le serializer
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  full_name: string;
+  client_type: string;
+  agency: number;
+}
+
 
 export interface Agency {
   id: number;
@@ -77,7 +91,10 @@ export interface Property {
   agency: number;
   agent?: number;
   created_at: string;
+  is_contacted?: boolean;
+  has_pending_visit?: boolean;
 }
+
 
 export interface Client {
   id: number;
@@ -90,6 +107,7 @@ export interface Client {
   agency: number;
   created_at: string;
 }
+
 
 export interface Transaction {
   id: number;

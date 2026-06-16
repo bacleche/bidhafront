@@ -49,12 +49,14 @@ export const endpoints = {
   properties: '/properties/', 
   propertiesFeatured: '/properties/featured/', 
   propertiesStats: '/properties/stats/',
-  clients: '/clients/',
   transactions: '/transactions/', 
   transactionsStats: '/transactions/stats/',
   contracts: '/contracts/',
+  clients: '/clients/',
 
    contactRequests: '/contact-requests/',
   visitRequests: '/visit-requests/',
   complaints: '/complaints/',
+  notifications: '/notifications/',
 };
+

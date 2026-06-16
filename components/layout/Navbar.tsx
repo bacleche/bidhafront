@@ -1,13 +1,31 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Building2, Menu, X, ChevronDown, User, LogOut, LayoutDashboard, Home, Search, Phone } from 'lucide-react';
+import { Building2, Menu, X, ChevronDown, User, LogOut, LayoutDashboard, Bell, Settings } from 'lucide-react';
+
+import { api, endpoints } from '@/lib/api';
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const fetchUnread = () => {
+      api.get(endpoints.notifications)
+        .then(r => {
+          const count = r.data.filter((n: any) => !n.is_read).length;
+          setUnread(count);
+        })
+        .catch(() => {});
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-blue-100 shadow-sm">
@@ -32,35 +50,59 @@ export default function Navbar() {
           {/* Right actions */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
-              <div className="relative">
-                <button onClick={() => setUserMenu(!userMenu)} className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-blue-50 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-sm font-bold">
-                    {user?.first_name?.[0]}{user?.last_name?.[0]}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-gray-800 leading-tight">{user?.first_name} {user?.last_name}</p>
-                    <p className="text-xs text-blue-500 capitalize">{user?.role?.replace('_',' ')}</p>
-                  </div>
-                  <ChevronDown size={14} className="text-gray-400" />
-                </button>
-                {userMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden z-50 animate-fade-up">
-                    <div className="p-3 border-b border-gray-100">
-                      <p className="text-xs text-gray-500 font-medium">Connecté en tant que</p>
-                      <p className="text-sm font-bold text-gray-800">{user?.email}</p>
+              <>
+                {/* Notification Bell */}
+                <Link href="/dashboard/notifications" className="relative w-10 h-10 rounded-xl hover:bg-blue-50 flex items-center justify-center text-gray-500 hover:text-blue-600 transition-all">
+                  <Bell size={20} />
+                  {unread > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 animate-pulse">
+                      {unread > 9 ? '9+' : unread}
+                    </span>
+                  )}
+                </Link>
+
+                {/* User menu */}
+                <div className="relative">
+                  <button onClick={() => setUserMenu(!userMenu)} className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-blue-50 transition-all">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-sm font-bold">
+                      {user?.first_name?.[0]}{user?.last_name?.[0]}
                     </div>
-                    <Link href="/dashboard" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
-                      <LayoutDashboard size={15} /> Tableau de bord
-                    </Link>
-                    <Link href="/dashboard/profile" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
-                      <User size={15} /> Mon profil
-                    </Link>
-                    <button onClick={() => { logout(); setUserMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-all border-t border-gray-100">
-                      <LogOut size={15} /> Déconnexion
-                    </button>
-                  </div>
-                )}
-              </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-gray-800 leading-tight">{user?.first_name} {user?.last_name}</p>
+                      <p className="text-xs text-blue-500 capitalize">{user?.role?.replace('_',' ')}</p>
+                    </div>
+                    <ChevronDown size={14} className="text-gray-400" />
+                  </button>
+                  {userMenu && (
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden z-50 animate-fade-up">
+                      <div className="p-3 border-b border-gray-100">
+                        <p className="text-xs text-gray-500 font-medium">Connecté en tant que</p>
+                        <p className="text-sm font-bold text-gray-800">{user?.email}</p>
+                      </div>
+                      <Link href="/dashboard" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <LayoutDashboard size={15} /> Tableau de bord
+                      </Link>
+                      <Link href="/dashboard/notifications" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <Bell size={15} /> Notifications
+                        {unread > 0 && (
+                          <span className="ml-auto min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
+                            {unread}
+                          </span>
+                        )}
+                      </Link>
+                      <Link href="/dashboard/profile" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <User size={15} /> Mon profil
+                      </Link>
+                      <Link href="/dashboard/settings" onClick={() => setUserMenu(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <Settings size={15} /> Paramètres
+                      </Link>
+                      <button onClick={() => { logout(); setUserMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-all border-t border-gray-100">
+                        <LogOut size={15} /> Déconnexion
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <>
                 <Link href="/login" className="px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 rounded-xl transition-all">Connexion</Link>
@@ -85,6 +127,10 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="flex-1 text-center py-2.5 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl">Dashboard</Link>
+                  <Link href="/dashboard/notifications" onClick={() => setOpen(false)} className="relative py-2.5 px-4 text-sm font-bold text-gray-600 bg-gray-50 rounded-xl">
+                    <Bell size={16} />
+                    {unread > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unread}</span>}
+                  </Link>
                   <button onClick={logout} className="flex-1 py-2.5 text-sm font-bold text-red-500 bg-red-50 rounded-xl">Déconnexion</button>
                 </>
               ) : (

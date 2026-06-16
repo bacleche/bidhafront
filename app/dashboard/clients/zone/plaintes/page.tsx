@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { AlertTriangle, Home, Clock, CheckCircle, Search, Filter } from 'lucide-react';
 import { api, endpoints } from '@/lib/api';
+import Navbar from '@/components/layout/Navbar';
 
 const COMPLAINT_STATUS = {
   open: { label: 'Ouverte', color: 'bg-red-100 text-red-700 border-red-200' },
@@ -21,8 +22,10 @@ export default function ComplaintManager() {
   }, []);
 
   return (
+     <div className="min-h-screen bg-gray-50">
+           <Navbar />   
     <div className="max-w-3xl mx-auto p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
+     
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Gestion des plaintes</h1>
         <p className="text-gray-500 text-sm">Suivez l'état de vos signalements et les réponses de l'agence.</p>
@@ -93,5 +96,6 @@ export default function ComplaintManager() {
         </div>
       )}
     </div>
+      </div>
   );
 }

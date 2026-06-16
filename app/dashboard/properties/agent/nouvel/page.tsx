@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { api, endpoints } from '@/lib/api';
-import { UserPlus, X, Loader2, Users } from 'lucide-react';
+import { UserPlus, X, Loader2, Users, Edit2, Trash2 } from 'lucide-react';
+import Navbar from '@/components/layout/Navbar';
 
 type Agent = {
   id: number;
@@ -20,14 +21,17 @@ const EMPTY_FORM = {
 export default function AgentsPage() {
   const { user } = useAuth();
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const fetchAgents = async () => {
-    const { data } = await api.get(endpoints.agents);
-    setAgents(data.results ?? data);
+    try {
+      const { data } = await api.get(endpoints.agents);
+      setAgents(data.results ?? data);
+    } catch (e) { console.error(e); }
   };
 
   useEffect(() => { fetchAgents(); }, []);
@@ -35,21 +39,50 @@ export default function AgentsPage() {
   const handleSubmit = async () => {
     setLoading(true); setError('');
     try {
-      await api.post(endpoints.agents, form);
+      if (editingAgent) {
+        await api.patch(`${endpoints.agents}${editingAgent.id}/`, form);
+      } else {
+        await api.post(endpoints.agents, form);
+      }
       setShowForm(false);
+      setEditingAgent(null);
       setForm(EMPTY_FORM);
       fetchAgents();
     } catch (e: any) {
-      const msg = e.response?.data;
-      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      setError("Erreur lors de l'enregistrement. Vérifiez les champs.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (id: number) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cet agent ?")) return;
+    try {
+      await api.delete(`${endpoints.agents}${id}/`);
+      fetchAgents();
+    } catch (e) { alert("Erreur lors de la suppression"); }
+  };
+
+  const openEdit = (agent: Agent) => {
+    setEditingAgent(agent);
+    setForm({
+      first_name: agent.user.first_name,
+      last_name: agent.user.last_name,
+      username: agent.user.email, // Ajustez selon votre backend
+      email: agent.user.email,
+      phone: agent.user.phone,
+      password: '', // On ne remplit jamais le mot de passe en édition
+      specialization: agent.specialization,
+      commission_rate: agent.commission_rate,
+    });
+    setShowForm(true);
+  };
+
   const isOwner = user?.role === 'agency_owner';
 
   return (
+      <div className="min-h-screen bg-gray-50">
+              <Navbar />
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -57,91 +90,61 @@ export default function AgentsPage() {
           <p className="text-sm text-gray-500 mt-1">{agents.length} agent(s) actif(s)</p>
         </div>
         {isOwner && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors"
-          >
+          <button onClick={() => { setEditingAgent(null); setForm(EMPTY_FORM); setShowForm(true); }}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700">
             <UserPlus size={16} /> Nouvel agent
           </button>
         )}
       </div>
 
-      {/* Liste agents */}
-      {agents.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <Users size={40} className="mx-auto mb-3 opacity-40" />
-          <p className="font-medium">Aucun agent pour le moment</p>
-          {isOwner && <p className="text-sm mt-1">Créez votre premier agent ci-dessus.</p>}
-        </div>
-      ) : (
-        <div className="grid gap-3">
-          {agents.map((a) => (
-            <div key={a.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4 shadow-sm">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
-                {a.user.first_name[0]}{a.user.last_name[0]}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900">{a.user.first_name} {a.user.last_name}</p>
-                <p className="text-xs text-gray-500">{a.user.email} · {a.employee_id}</p>
-                {a.specialization && <p className="text-xs text-gray-400">{a.specialization}</p>}
-              </div>
-              <span className="text-xs bg-blue-50 text-blue-700 font-semibold px-3 py-1 rounded-full">
-                {a.commission_rate}% commission
-              </span>
+      <div className="grid gap-3">
+        {agents.map((a) => (
+          <div key={a.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4 shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
+              {a.user.first_name?.[0]}{a.user.last_name?.[0]}
             </div>
-          ))}
-        </div>
-      )}
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-gray-900">{a.user.first_name} {a.user.last_name}</p>
+              <p className="text-xs text-gray-500">{a.user.email} · {a.employee_id}</p>
+            </div>
+            {isOwner && (
+              <div className="flex gap-2">
+                <button onClick={() => openEdit(a)} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={16} /></button>
+                <button onClick={() => handleDelete(a.id)} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={16} /></button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* Modal création */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl">
             <div className="flex items-center justify-between p-5 border-b">
-              <h2 className="font-bold text-lg">Créer un agent</h2>
-              <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-700">
-                <X size={20} />
-              </button>
+              <h2 className="font-bold text-lg">{editingAgent ? "Modifier l'agent" : "Créer un agent"}</h2>
+              <button onClick={() => setShowForm(false)} className="text-gray-400"><X size={20} /></button>
             </div>
             <div className="p-5 grid grid-cols-2 gap-3">
-              {[
-                { key: 'first_name', label: 'Prénom' },
-                { key: 'last_name', label: 'Nom' },
-                { key: 'username', label: 'Nom d\'utilisateur' },
-                { key: 'email', label: 'Email' },
-                { key: 'phone', label: 'Téléphone' },
-                { key: 'password', label: 'Mot de passe', type: 'password' },
-                { key: 'specialization', label: 'Spécialisation' },
-                { key: 'commission_rate', label: 'Commission (%)', type: 'number' },
-              ].map(({ key, label, type = 'text' }) => (
+              {[ { key: 'first_name', label: 'Prénom' }, { key: 'last_name', label: 'Nom' }, { key: 'email', label: 'Email' }, { key: 'phone', label: 'Téléphone' }, { key: 'specialization', label: 'Spécialisation' }, { key: 'commission_rate', label: 'Commission (%)', type: 'number' } ].map(({ key, label, type = 'text' }) => (
                 <div key={key} className={key === 'specialization' ? 'col-span-2' : ''}>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
-                  <input
-                    type={type}
-                    value={(form as any)[key]}
-                    onChange={(e) => setForm(f => ({ ...f, [key]: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <input type={type} value={(form as any)[key]} onChange={(e) => setForm(f => ({ ...f, [key]: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" />
                 </div>
               ))}
             </div>
             {error && <p className="px-5 pb-2 text-red-500 text-xs">{error}</p>}
             <div className="p-5 pt-0 flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">
-                Annuler
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50"
-              >
-                {loading && <Loader2 size={14} className="animate-spin" />}
-                Créer l'agent
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">Annuler</button>
+              <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
+                {loading ? <Loader2 size={14} className="animate-spin" /> : editingAgent ? "Enregistrer" : "Créer"}
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
+    </div>
+
+    
   );
 }

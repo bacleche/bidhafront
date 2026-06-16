@@ -1,10 +1,16 @@
 'use client';
+import Footer from '@/components/layout/Footer';
+import Navbar from '@/components/layout/Navbar';
 import { FileText, CheckCircle, Clock, Home } from 'lucide-react';
 
 export default function ClientTransactionView({ transaction }: { transaction: any }) {
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <h1 className="text-xl font-bold">Suivi de mon dossier</h1>
+
+    <div className="min-h-screen bg-gray-50">
+       <Navbar />   
+
+    <div className="max-w-2xl mx-auto p-6 space-y-6  min-h-screen bg-gray-50">
+       <h1 className="text-xl font-bold">Suivi de mon dossier</h1>
 
       {/* Carte Résumé */}
       <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
@@ -44,5 +50,7 @@ export default function ClientTransactionView({ transaction }: { transaction: an
         </div>
       </div>
     </div>
+    </div>
+
   );
 }

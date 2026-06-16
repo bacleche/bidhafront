@@ -5,6 +5,7 @@ import {
   CalendarCheck, Clock, CheckCircle, XCircle, RefreshCw,
   Search, SlidersHorizontal, MapPin, User, Calendar
 } from 'lucide-react';
+import Navbar from '@/components/layout/Navbar';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   pending:     { label: 'En attente',    color: 'bg-amber-100 text-amber-700',    icon: Clock },
@@ -56,6 +57,8 @@ export default function OwnerVisitsPage() {
   }, {} as Record<string, number>);
 
   return (
+    <div className="min-h-screen bg-gray-50">
+              <Navbar />
     <div className="p-6 max-w-5xl mx-auto space-y-6">
 
       {/* Header */}
@@ -211,5 +214,7 @@ export default function OwnerVisitsPage() {
         </div>
       )}
     </div>
+    </div>
+
   );
 }

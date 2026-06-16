@@ -4,6 +4,7 @@ import { api, endpoints } from '@/lib/api';
 import { Property } from '@/types';
 import { Plus, Home, MapPin, Trash2, Search, SlidersHorizontal, Eye, DollarSign } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar';
 
 const TYPE_LABELS: Record<string, string> = {
   apartment: 'Appartement',
@@ -63,6 +64,8 @@ export default function DashboardPropertiesPage() {
   });
 
   return (
+    <div className="min-h-screen bg-gray-50">
+              <Navbar />  
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -201,5 +204,8 @@ export default function DashboardPropertiesPage() {
         </div>
       )}
     </div>
+    </div>
+
+   
   );
 }

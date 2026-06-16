@@ -5,6 +5,7 @@ import { api, endpoints } from '@/lib/api';
 import StatsCard from '@/components/ui/StatsCard';
 import { Home, Users, ArrowLeftRight, TrendingUp, FileText, Building2, AlertCircle, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar';
 
 function formatAmount(n: number) {
   if (n >= 1_000_000) return `${(n/1_000_000).toFixed(1)} M FCFA`;
@@ -169,6 +170,8 @@ export default function DashboardPage() {
   const TYPE_LABEL: Record<string,string> = { sale:'Vente', rent:'Location', purchase:'Achat' };
 
   return (
+      <div className="min-h-screen bg-gray-50">
+              <Navbar />
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8 animate-fade-up">
@@ -266,5 +269,9 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </div>
+
+
+   
   );
 }

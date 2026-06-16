@@ -11,8 +11,28 @@ import {
   MapPin, Maximize2, Bed, Bath, Car, Trees, Waves, Shield, Sofa,
   ArrowLeft, Eye, Phone, Mail, Share2, Heart, CheckCircle2,
   MessageCircle, CalendarCheck, AlertTriangle, X, Loader2, Send,
-  Clock, CheckCircle, XCircle, RefreshCw
+  Clock, CheckCircle, XCircle, RefreshCw, Star
 } from 'lucide-react';
+
+function StarRating({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map(s => (
+        <button
+          key={s}
+          type="button"
+          onClick={() => onChange?.(s)}
+          className={onChange ? 'cursor-pointer' : 'cursor-default'}
+        >
+          <Star
+            size={20}
+            className={s <= value ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
 
 function formatPrice(p: string) {
   const n = parseFloat(p);
@@ -33,7 +53,7 @@ const COMPLAINT_CATEGORIES = [
   { value: 'other', label: 'Autre' },
 ];
 
-type ModalType = 'contact' | 'visit' | 'complaint' | null;
+type ModalType = 'contact' | 'visit' | 'complaint' | 'review' | null;
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -47,6 +67,11 @@ export default function PropertyDetailPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
+  // Reviews state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewStars, setReviewStars] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+
   // Forms
   const [contactMsg, setContactMsg] = useState("J'aimerais en savoir un peu plus sur ce bien.");
   const [visitDate, setVisitDate] = useState('');
@@ -55,7 +80,14 @@ export default function PropertyDetailPage() {
 
   useEffect(() => {
     api.get(`${endpoints.properties}${id}/`)
-      .then(r => setProperty(r.data))
+      .then(r => {
+        setProperty(r.data);
+        if (r.data.agency) {
+          api.get(`${endpoints.agencies}${r.data.agency}/reviews/`)
+            .then(res => setReviews(res.data))
+            .catch(console.error);
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [id]);
@@ -78,6 +110,7 @@ export default function PropertyDetailPage() {
     try {
       await api.post(endpoints.contactRequests, { property: id, message: contactMsg });
       setSuccess('Votre message a été envoyé à l\'agent. Il vous répondra prochainement.');
+      if (property) setProperty({ ...property, is_contacted: true });
     } catch (e: any) {
       setError(e.response?.data?.detail || 'Erreur lors de l\'envoi.');
     } finally { setSubmitting(false); }
@@ -93,6 +126,7 @@ export default function PropertyDetailPage() {
         notes: visitNotes,
       });
       setSuccess('Demande de visite envoyée. L\'agent vous confirmera sous peu.');
+      if (property) setProperty({ ...property, has_pending_visit: true });
     } catch (e: any) {
       setError(e.response?.data?.detail || 'Erreur lors de la demande.');
     } finally { setSubmitting(false); }
@@ -109,6 +143,24 @@ export default function PropertyDetailPage() {
       setSuccess('Plainte enregistrée. Le responsable de l\'agence en sera informé.');
     } catch (e: any) {
       setError(e.response?.data?.detail || 'Erreur lors de l\'envoi.');
+    } finally { setSubmitting(false); }
+  };
+
+  const handleReview = async () => {
+    if (!property?.agency) return;
+    setSubmitting(true); setError('');
+    try {
+      await api.post(`${endpoints.agencies}${property.agency}/add_review/`, {
+        stars: reviewStars,
+        comment: reviewComment
+      });
+      setSuccess('Merci ! Votre avis a bien été enregistré.');
+      setReviewComment('');
+      // Re-charger les avis
+      const res = await api.get(`${endpoints.agencies}${property.agency}/reviews/`);
+      setReviews(res.data);
+    } catch (e: any) {
+      setError(e.response?.data?.detail || 'Erreur lors de l\'enregistrement de l\'avis.');
     } finally { setSubmitting(false); }
   };
 
@@ -133,6 +185,11 @@ export default function PropertyDetailPage() {
     { icon: Shield, label: 'Sécurité', active: property.security },
     { icon: Sofa, label: 'Meublé', active: property.furnished },
   ].filter(a => a.active);
+
+  const avgStars = reviews.length > 0
+    ? (reviews.reduce((sum: number, r: any) => sum + r.stars, 0) / reviews.length).toFixed(1)
+    : null;
+
 
   return (
     <div className="min-h-screen">
@@ -222,6 +279,50 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* ── AVIS AGENCE ── */}
+            <div className="bidhaa-card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="font-display font-bold text-lg text-gray-900">Avis sur l'agence</h2>
+                  {avgStars ? (
+                    <div className="flex items-center gap-2 mt-1">
+                      <StarRating value={Math.round(Number(avgStars))} />
+                      <span className="text-sm font-bold text-amber-500">{avgStars}</span>
+                      <span className="text-xs text-gray-400">({reviews.length} avis)</span>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1">Aucun avis pour le moment</p>
+                  )}
+                </div>
+                {isLoggedIn && !isAgent && (
+                  <button
+                    onClick={() => openModal('review')}
+                    className="px-4 py-2 text-sm font-bold text-blue-600 border-2 border-blue-200 rounded-xl hover:bg-blue-50 transition-all"
+                  >
+                    Donner un avis
+                  </button>
+                )}
+              </div>
+              {reviews.length > 0 && (
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                  {reviews.map((r: any) => (
+                    <div key={r.id} className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700">
+                            {r.client_name?.[0] ?? 'C'}
+                          </div>
+                          <span className="text-sm font-semibold text-gray-800">{r.client_name ?? 'Client'}</span>
+                        </div>
+                        <StarRating value={r.stars} />
+                      </div>
+                      {r.comment && <p className="text-xs text-gray-500 leading-relaxed">{r.comment}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right */}
@@ -251,18 +352,36 @@ export default function PropertyDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <button
-                    onClick={() => openModal('contact')}
-                    className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-blue-200 transition-all text-sm flex items-center justify-center gap-2"
-                  >
-                    <MessageCircle size={16} /> Contacter l'agent
-                  </button>
-                  <button
-                    onClick={() => openModal('visit')}
-                    className="w-full py-3 border-2 border-blue-200 text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all text-sm flex items-center justify-center gap-2"
-                  >
-                    <CalendarCheck size={16} /> Planifier une visite
-                  </button>
+                  {property.is_contacted ? (
+                    <button
+                      disabled
+                      className="w-full py-3.5 bg-gray-150 text-gray-400 font-bold rounded-2xl text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-gray-200"
+                    >
+                      <CheckCircle2 size={16} className="text-gray-400" /> Déjà contacté
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => openModal('contact')}
+                      className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-blue-200 transition-all text-sm flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle size={16} /> Contacter l'agent
+                    </button>
+                  )}
+                  {property.has_pending_visit ? (
+                    <button
+                      disabled
+                      className="w-full py-3 bg-gray-150 text-gray-400 font-bold rounded-2xl text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-gray-200"
+                    >
+                      <Clock size={16} className="text-gray-400" /> Visite en attente
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => openModal('visit')}
+                      className="w-full py-3 border-2 border-blue-200 text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all text-sm flex items-center justify-center gap-2"
+                    >
+                      <CalendarCheck size={16} /> Planifier une visite
+                    </button>
+                  )}
                   <button
                     onClick={() => openModal('complaint')}
                     className="w-full py-2.5 border border-red-100 text-red-400 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all text-xs flex items-center justify-center gap-2 font-semibold"
@@ -493,6 +612,62 @@ export default function PropertyDetailPage() {
                   >
                     {submitting ? <Loader2 size={15} className="animate-spin" /> : <AlertTriangle size={15} />}
                     Soumettre la plainte
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL AVIS AGENCE ── */}
+      {modal === 'review' && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <Star size={17} className="text-amber-500" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-gray-900">Donner un avis</h2>
+                  <p className="text-xs text-gray-400">{property.agency_name}</p>
+                </div>
+              </div>
+              <button onClick={closeModal} className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200">
+                <X size={15} />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              {success ? (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                  <CheckCircle size={28} className="text-emerald-500 mx-auto mb-2" />
+                  <p className="text-emerald-700 font-semibold text-sm">{success}</p>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-2">Votre note</label>
+                    <StarRating value={reviewStars} onChange={setReviewStars} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Commentaire <span className="text-gray-400">(optionnel)</span></label>
+                    <textarea
+                      rows={3}
+                      placeholder="Partagez votre expérience avec cette agence..."
+                      value={reviewComment}
+                      onChange={e => setReviewComment(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                    />
+                  </div>
+                  {error && <p className="text-red-500 text-xs">{error}</p>}
+                  <button
+                    onClick={handleReview}
+                    disabled={submitting}
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-400 to-amber-600 text-white font-bold rounded-xl hover:shadow-lg transition-all text-sm disabled:opacity-50"
+                  >
+                    {submitting ? <Loader2 size={15} className="animate-spin" /> : <Star size={15} />}
+                    Publier mon avis
                   </button>
                 </>
               )}

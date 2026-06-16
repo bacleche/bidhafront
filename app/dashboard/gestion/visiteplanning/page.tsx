@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api, endpoints } from '@/lib/api';
 import { CalendarCheck, Clock, CheckCircle, XCircle, RefreshCw, Loader2 } from 'lucide-react';
+import Navbar from '@/components/layout/Navbar';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending:     { label: 'En attente',    color: 'bg-amber-100 text-amber-700' },
@@ -44,6 +45,8 @@ export default function VisitsPage() {
   };
 
   return (
+     <div className="min-h-screen bg-gray-50">
+              <Navbar />
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <h1 className="font-bold text-2xl text-gray-900">Demandes de visite</h1>
@@ -162,5 +165,9 @@ export default function VisitsPage() {
         </div>
       )}
     </div>
+    </div>
+
+
+   
   );
 }

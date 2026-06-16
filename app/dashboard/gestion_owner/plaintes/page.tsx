@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api, endpoints } from '@/lib/api';
 import { AlertTriangle, CheckCircle, Clock, XCircle, MessageSquare, X, Loader2 } from 'lucide-react';
+import Navbar from '@/components/layout/Navbar';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   open:        { label: 'Ouverte',        color: 'bg-red-100 text-red-600' },
@@ -52,6 +53,8 @@ export default function ComplaintsPage() {
   const openCount = complaints.filter(c => c.status === 'open').length;
 
   return (
+    <div className="min-h-screen bg-gray-50">
+              <Navbar />
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -220,5 +223,9 @@ export default function ComplaintsPage() {
         </div>
       )}
     </div>
+    </div>
+
+
+      
   );
 }

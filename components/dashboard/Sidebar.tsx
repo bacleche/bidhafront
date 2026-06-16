@@ -2,9 +2,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, Building2, Home, Users, User, ArrowLeftRight, FileText, Settings, LogOut, ChevronRight, AlertTriangle, CalendarCheck, MessageCircle } from 'lucide-react';
+import { 
+  LayoutDashboard, Building2, Home, Users, User, ArrowLeftRight, 
+  FileText, Settings, LogOut, ChevronRight, AlertTriangle, 
+  CalendarCheck, MessageCircle 
+} from 'lucide-react';
 
-type Role = 'admin' | 'agency_owner' | 'agent' | 'client';
+// Configuration des menus par rôle
 const NAV_ITEMS = {
   admin: [
     { href: '/dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, exact: true },
@@ -17,17 +21,12 @@ const NAV_ITEMS = {
   agency_owner: [
     { href: '/dashboard', label: 'Mon Agence', icon: LayoutDashboard, exact: true },
     { href: '/dashboard/properties/agent/nouvel', label: 'Nouvel Agent', icon: LayoutDashboard, exact: true },
-    { href: '/dashboard/properties', label: 'Mes Biens', icon: Home  , exact: true},
+    { href: '/dashboard/properties', label: 'Mes Biens', icon: Home, exact: true },
     { href: '/dashboard/transactions', label: 'Suivi Financier', icon: ArrowLeftRight },
-    { href: '/dashboard/gestion_owner/contracts', label: 'Initialiser Contrat', icon: FileText , exact: true  },
+    { href: '/dashboard/gestion_owner/contracts', label: 'Initialiser Contrat', icon: FileText, exact: true },
     { href: '/dashboard/gestion_owner/contracts/list', label: 'Liste des Contrats', icon: FileText },
-
-    { href: '/dashboard/gestion_owner/transactions', label: 'Gestion transactions', icon: ArrowLeftRight },
     { href: '/dashboard/gestion_owner/plaintes', label: 'Gestion plaintes', icon: AlertTriangle },
     { href: '/dashboard/gestion_owner/liste_visite', label: 'Gestion visite', icon: CalendarCheck },
-
-
-
   ],
   agent: [
     { href: '/dashboard', label: 'Mon Tableau de Bord', icon: LayoutDashboard, exact: true },
@@ -36,16 +35,12 @@ const NAV_ITEMS = {
     { href: '/dashboard/gestion/transactions', label: 'Gestion transactions', icon: ArrowLeftRight },
     { href: '/dashboard/gestion/messages', label: 'Messages clients', icon: MessageCircle },
     { href: '/dashboard/gestion/visiteplanning', label: 'Gestion planning', icon: CalendarCheck },
-
-
   ],
   client: [
     { href: '/dashboard/clients', label: 'Mon Espace', icon: LayoutDashboard, exact: true },
     { href: '/dashboard/clients/transactions', label: 'Gestion transactions', icon: ArrowLeftRight },
     { href: '/dashboard/clients/zone/contrats', label: 'Mes contrats', icon: LayoutDashboard, exact: true },
     { href: '/dashboard/clients/zone/plaintes', label: 'Mes plaintes', icon: AlertTriangle, exact: true },
-
-
   ]
 };
 
@@ -53,14 +48,13 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  // Filtrage des items selon le rôle de l'utilisateur
-  // Si aucun rôle n'est trouvé, on n'affiche rien ou seulement le tableau de bord
-const userRole = (user?.role as Role) || 'client'; 
+  // Sécurisation du rôle : conversion en minuscule pour éviter les erreurs de casse
+  const userRole = (user?.role?.toLowerCase() as keyof typeof NAV_ITEMS) || 'client';
   const allowedItems = NAV_ITEMS[userRole] || [];
 
   return (
     <aside className="w-64 bg-gradient-to-b from-blue-950 to-blue-900 min-h-screen flex flex-col text-white shrink-0">
-      {/* Logo */}
+      {/* Logo & Info utilisateur */}
       <div className="p-5 border-b border-white/10">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
@@ -79,12 +73,20 @@ const userRole = (user?.role as Role) || 'client';
         </div>
       </div>
 
-      {/* Nav dynamique */}
+      {/* Navigation dynamique */}
       <nav className="flex-1 p-3 space-y-0.5">
         {allowedItems.map(({ href, label, icon: Icon, exact }) => {
+          // Logique d'activation intelligente
           const active = exact ? pathname === href : pathname.startsWith(href);
+          
           return (
-            <Link key={href} href={href} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all group ${active ? 'bg-white/15 text-white' : 'text-blue-200 hover:bg-white/10 hover:text-white'}`}>
+            <Link 
+              key={href} 
+              href={href} 
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all group ${
+                active ? 'bg-white/15 text-white' : 'text-blue-200 hover:bg-white/10 hover:text-white'
+              }`}
+            >
               <Icon size={17} className={active ? 'text-blue-300' : 'text-blue-400 group-hover:text-blue-300'} />
               {label}
               {active && <ChevronRight size={14} className="ml-auto text-blue-300" />}
@@ -93,12 +95,15 @@ const userRole = (user?.role as Role) || 'client';
         })}
       </nav>
 
-      {/* Bottom actions */}
+      {/* Actions de bas de page */}
       <div className="p-3 border-t border-white/10 space-y-0.5">
         <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-blue-200 hover:bg-white/10 hover:text-white transition-all font-semibold">
           <Settings size={16} /> Paramètres
         </Link>
-        <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all font-semibold">
+        <button 
+          onClick={logout} 
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all font-semibold"
+        >
           <LogOut size={16} /> Déconnexion
         </button>
       </div>

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { api, endpoints } from '@/lib/api';
 import { TransactionModal } from './TransactionModal';
+import Navbar from '@/components/layout/Navbar';
 
 export default function TransactionsManager() {
   const [showForm, setShowForm] = useState(false);
@@ -23,6 +24,8 @@ export default function TransactionsManager() {
   useEffect(() => { fetchTransactions(); }, []);
 
   return (
+     <div className="min-h-screen bg-gray-50">
+              <Navbar />
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -70,6 +73,8 @@ export default function TransactionsManager() {
           </tbody>
         </table>
       </div>
+      </div>
+
 
       {showForm && (
         <TransactionModal 
