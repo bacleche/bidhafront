@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// Assurez-vous que l'URL ne finit pas par un slash pour éviter les doubles //
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'bidhaback-production.up.railway.app/api';
 
 export const api = axios.create({
   baseURL: API_BASE,
