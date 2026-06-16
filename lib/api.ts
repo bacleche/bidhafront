@@ -9,6 +9,12 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+export const getImg = (path: string) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  const base = API_BASE.replace('/api', '');
+  return `${base}${path}`;
+};
 
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
