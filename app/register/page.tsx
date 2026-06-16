@@ -7,7 +7,7 @@ import { Building2, Loader2, User, Building, Users } from 'lucide-react';
 
 const ROLES = [
   { value: 'agency_owner', label: "Propriétaire d'agence", icon: Building, desc: 'Gérez votre agence et vos biens' },
-  { value: 'agent', label: 'Agent immobilier', icon: Users, desc: 'Gérez vos clients et transactions' },
+  // { value: 'agent', label: 'Agent immobilier', icon: Users, desc: 'Gérez vos clients et transactions' },
   { value: 'client', label: 'Particulier / Client', icon: User, desc: 'Recherchez et achetez des biens' },
 ];
 
