@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { api, endpoints , getImageUrl } from '@/lib/api';
+import { api, endpoints } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { Property } from '@/types';
 import {
@@ -52,7 +52,7 @@ const COMPLAINT_CATEGORIES = [
   { value: 'transaction', label: 'Problème transaction' },
   { value: 'other', label: 'Autre' },
 ];
-// const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://bidhaback-production.up.railway.app/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://bidhaback-production.up.railway.app/api';
 
 
 type ModalType = 'contact' | 'visit' | 'complaint' | 'review' | null;
@@ -206,7 +206,7 @@ export default function PropertyDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-3xl overflow-hidden bg-blue-50 h-80 md:h-96 relative">
               {property.images?.[activeImg] ? (
-                <img src={getImageUrl(property.images[activeImg].image)} alt={property.title} className="w-full h-full object-cover" />
+                <img src={API_BASE + property.images[activeImg].image} alt={property.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center">
@@ -231,7 +231,7 @@ export default function PropertyDetailPage() {
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {property.images.map((img, i) => (
                   <button key={img.id} onClick={() => setActiveImg(i)} className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${i === activeImg ? 'border-blue-500 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                    <img src={getImageUrl(img.image)} alt="" className="w-full h-full object-cover" />
+                    <img src={API_BASE + img.image} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

@@ -10,12 +10,6 @@ export const api = axios.create({
 });
 
 
-export const getImageUrl = (path: string | null | undefined): string => {
-  if (!path) return '';
-  if (path.startsWith('http')) return path;
-  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://bidhaback-production.up.railway.app/api').replace('/api', '');
-  return `${base}${path}`;
-};
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('access_token');
