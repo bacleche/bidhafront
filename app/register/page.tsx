@@ -49,7 +49,7 @@ export default function RegisterPage() {
           {/* Role selector */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-3">Je suis...</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {ROLES.map(({ value, label, icon: Icon, desc }) => (
                 <button key={value} type="button" onClick={() => setRole(value)} className={`p-3 rounded-2xl border-2 text-left transition-all ${role===value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-200'}`}>
                   <Icon size={18} className={role===value ? 'text-blue-600 mb-1.5' : 'text-gray-400 mb-1.5'} />
