@@ -67,7 +67,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-blue-300 text-sm">© 2024 Bidhaa. Tous droits réservés.</p>
+          <p className="text-blue-300 text-sm">© 2026 Bidhaa - Dev | nkouka@darius. Tous droits réservés.</p>
           <div className="flex gap-6">
             {['Mentions légales','Confidentialité','CGU'].map(l => (
               <a key={l} href="#" className="text-blue-300 text-sm hover:text-white transition-colors">{l}</a>
