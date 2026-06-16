@@ -83,7 +83,9 @@ export default function NewPropertyPage() {
         imgFd.append('image', images[i]);
         imgFd.append('is_cover', i === 0 ? 'true' : 'false');
         imgFd.append('order', String(i));
-        await api.post('/property-images/', imgFd, { headers: { 'Content-Type': 'multipart/form-data' } }).catch(() => { });
+        await api.post(endpoints.propertyImages, imgFd, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
       }
       router.push('/dashboard/properties');
     } catch (err: any) {

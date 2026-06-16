@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { api, endpoints } from '@/lib/api';
+import { api, endpoints  , getImg} from '@/lib/api';
 import { Property } from '@/types';
 import { Plus, Home, MapPin, Trash2, Search, SlidersHorizontal, Eye, DollarSign } from 'lucide-react';
 import Link from 'next/link';
@@ -139,7 +139,7 @@ export default function DashboardPropertiesPage() {
                 <div className="h-48 w-full bg-gray-100 relative overflow-hidden shrink-0">
                   {coverImage ? (
                     <img 
-                      src={`${API_BASE}${coverImage}`} 
+                      src={getImg(coverImage)} 
                       alt={p.title} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

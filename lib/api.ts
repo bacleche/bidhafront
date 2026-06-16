@@ -57,17 +57,16 @@ export const endpoints = {
   agencies: '/agencies/', 
   agenciesMine: '/agencies/mine/', 
   agents: '/agents/',
-  properties: '/properties/', 
+  properties: '/properties/',
+  propertyImages: '/property-images/', // ← AJOUTE CETTE LIGNE
   propertiesFeatured: '/properties/featured/', 
   propertiesStats: '/properties/stats/',
   transactions: '/transactions/', 
   transactionsStats: '/transactions/stats/',
   contracts: '/contracts/',
   clients: '/clients/',
-
-   contactRequests: '/contact-requests/',
+  contactRequests: '/contact-requests/',
   visitRequests: '/visit-requests/',
   complaints: '/complaints/',
   notifications: '/notifications/',
 };
-
