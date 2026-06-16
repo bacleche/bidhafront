@@ -14,7 +14,7 @@ type Agent = {
 };
 
 const EMPTY_FORM = {
-  first_name: '', last_name: '', username: '', email: '',
+  first_name: '', last_name: '', email: '',
   phone: '', password: '', specialization: '', commission_rate: '5.00',
 };
 
@@ -39,11 +39,21 @@ export default function AgentsPage() {
   const handleSubmit = async () => {
     setLoading(true); setError('');
     
-    // Création propre de l'objet d'envoi sans modifier le state 'form'
-    let payload = { ...form };
-    if (editingAgent && !payload.password) {
-      const { password, ...rest } = payload;
-      payload = rest as any;
+    // Structuration conforme au Serializer Django
+    const payload: any = {
+      user: {
+        first_name: form.first_name,
+        last_name: form.last_name,
+        email: form.email,
+        phone: form.phone,
+      },
+      specialization: form.specialization,
+      commission_rate: form.commission_rate,
+    };
+
+    // Ajout du mot de passe uniquement si présent
+    if (form.password) {
+      payload.user.password = form.password;
     }
 
     try {
@@ -76,7 +86,6 @@ export default function AgentsPage() {
     setForm({
       first_name: agent.user.first_name,
       last_name: agent.user.last_name,
-      username: agent.user.email,
       email: agent.user.email,
       phone: agent.user.phone,
       password: '', 
@@ -95,7 +104,6 @@ export default function AgentsPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Mes Agents</h1>
-            <p className="text-sm text-gray-500 mt-1">{agents.length} agent(s) actif(s)</p>
           </div>
           {isOwner && (
             <button onClick={() => { setEditingAgent(null); setForm(EMPTY_FORM); setShowForm(true); }}
@@ -113,14 +121,12 @@ export default function AgentsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900">{a.user.first_name} {a.user.last_name}</p>
-                <p className="text-xs text-gray-500">{a.user.email} · {a.employee_id}</p>
+                <p className="text-xs text-gray-500">{a.user.email}</p>
               </div>
-              {isOwner && (
-                <div className="flex gap-2">
-                  <button onClick={() => openEdit(a)} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={16} /></button>
-                  <button onClick={() => handleDelete(a.id)} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={16} /></button>
-                </div>
-              )}
+              <div className="flex gap-2">
+                <button onClick={() => openEdit(a)} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={16} /></button>
+                <button onClick={() => handleDelete(a.id)} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={16} /></button>
+              </div>
             </div>
           ))}
         </div>
@@ -136,7 +142,7 @@ export default function AgentsPage() {
                 {[ 
                   { key: 'first_name', label: 'Prénom' }, { key: 'last_name', label: 'Nom' }, 
                   { key: 'email', label: 'Email' }, { key: 'phone', label: 'Téléphone' },
-                  { key: 'password', label: editingAgent ? 'Nouveau mot de passe' : 'Mot de passe', type: 'password' }, 
+                  { key: 'password', label: 'Mot de passe', type: 'password' }, 
                   { key: 'specialization', label: 'Spécialisation' }, 
                   { key: 'commission_rate', label: 'Commission (%)', type: 'number' } 
                 ].map(({ key, label, type = 'text' }) => (
@@ -147,7 +153,6 @@ export default function AgentsPage() {
                       value={(form as any)[key]} 
                       onChange={(e) => setForm(f => ({ ...f, [key]: e.target.value }))} 
                       className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" 
-                      placeholder={editingAgent && key === 'password' ? 'Laissez vide pour conserver' : ''}
                     />
                   </div>
                 ))}
@@ -156,7 +161,7 @@ export default function AgentsPage() {
               <div className="p-5 pt-0 flex justify-end gap-3">
                 <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">Annuler</button>
                 <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
-                  {loading ? <Loader2 size={14} className="animate-spin" /> : editingAgent ? "Enregistrer" : "Créer"}
+                  {loading ? <Loader2 size={14} className="animate-spin" /> : "Enregistrer"}
                 </button>
               </div>
             </div>
