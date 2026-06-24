@@ -45,7 +45,7 @@ export default function Navbar() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-md">
               <Building2 size={20} className="text-white" />
             </div>
-            <span className="font-display font-800 text-2xl gradient-text tracking-tight">Bidhaa</span>
+            <span className="font-display font-800 text-2xl gradient-text tracking-tight">Zua-Nayo</span>
           </Link>
 
           {/* Desktop nav */}
