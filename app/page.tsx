@@ -63,7 +63,7 @@ export default function HomePage() {
               au Congo
             </h1>
             <p className="text-blue-200 text-lg mb-8 leading-relaxed animate-fade-up" style={{animationDelay:'0.2s'}}>
-              Bidhaa connecte acheteurs, locataires et agences immobilières pour des transactions sûres et transparentes.
+              Zua-Nayo connecte acheteurs, locataires et agences immobilières pour des transactions sûres et transparentes.
             </p>
 
             <div className="animate-fade-up" style={{animationDelay:'0.3s'}}>
@@ -120,7 +120,7 @@ export default function HomePage() {
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[...Array(6)].map((_, i) => <div key={i} className="bidhaa-card h-80 bg-gradient-to-br from-gray-50 to-blue-50 animate-pulse"></div>)}
+            {[...Array(6)].map((_, i) => <div key={i} className="Zua-Nayo-card h-80 bg-gradient-to-br from-gray-50 to-blue-50 animate-pulse"></div>)}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -137,7 +137,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {SERVICES.map(({ icon: Icon, title, desc, color }) => (
-            <div key={title} className="bidhaa-card p-6 text-center group cursor-pointer">
+            <div key={title} className="Zua-Nayo-card p-6 text-center group cursor-pointer">
               <div className={`w-14 h-14 rounded-2xl ${color} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
                 <Icon size={24} />
               </div>
@@ -162,7 +162,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {agencies.map((agency) => (
-              <Link key={agency.id} href={`/agencies/${agency.id}`} className="bidhaa-card p-5 text-center group">
+              <Link key={agency.id} href={`/agencies/${agency.id}`} className="Zua-Nayo-card p-5 text-center group">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                   {agency.logo ? <img src={`http://localhost:8000${agency.logo}`} alt={agency.name} className="w-full h-full object-cover rounded-2xl" /> : <Building2 size={22} className="text-blue-500" />}
                 </div>
@@ -180,7 +180,7 @@ export default function HomePage() {
           <div className="absolute inset-0 opacity-10" style={{backgroundImage:'radial-gradient(circle at 30% 50%, white 0%, transparent 50%)'}}></div>
           <div className="relative z-10">
             <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">Vous êtes une agence immobilière ?</h2>
-            <p className="text-blue-200 text-lg mb-8 max-w-lg mx-auto">Rejoignez Bidhaa et gérez vos biens, agents, clients et contrats depuis une seule plateforme.</p>
+            <p className="text-blue-200 text-lg mb-8 max-w-lg mx-auto">Rejoignez Zua-Nayo et gérez vos biens, agents, clients et contrats depuis une seule plateforme.</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/register" className="px-8 py-3.5 bg-white text-blue-700 font-bold rounded-2xl hover:shadow-xl transition-all">Créer mon agence</Link>
               <Link href="/contact" className="px-8 py-3.5 bg-white/10 text-white font-bold rounded-2xl border border-white/20 hover:bg-white/20 transition-all">En savoir plus</Link>
